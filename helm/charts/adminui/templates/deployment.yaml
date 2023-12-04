@@ -45,6 +45,57 @@ spec:
         - name: settings-override
           configMap:
             name: configuration
+      initContainers:
+        {{ if eq .Values.config.global.configuration.infrastructure.provider "Postgres" }}- name: init-sql
+          image: postgres
+          command: psql -f /app/postgres/2-create-schemas-and-set-permissions.sql
+          environment:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "PASSWORD"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "USERNAME"
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "HOST"
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "DATABASE"
+        {{ else if eq .Values.config.global.configuration.infrastructure.provider "Postgres" }}
+          - name: init-sql
+          image: mcr.microsoft.com/mssql-tools
+          command: /opt/mssql-tools/bin/sqlcmd -i /app/sqlserver/2-create-schemas-and-set-permissions.sql
+          environment:
+            - name: SQLCMDPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "PASSWORD"
+            - name: SQLCMDUSER
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "USERNAME"
+            - name: SQLCMDSERVER
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "HOST"
+            - name: SQLCMDDBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: setup-db-info
+                  key: "DATABASE"
+        {{ end }}
       containers:
         - name: {{ include "global.name" . }}
           {{- with .Values.securityContext }}
