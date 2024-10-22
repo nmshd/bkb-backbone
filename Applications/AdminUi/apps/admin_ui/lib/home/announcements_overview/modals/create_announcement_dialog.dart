@@ -46,10 +46,12 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
   );
   late List<_LanguageTextController> _languageTextControllers;
 
+  final TextEditingController _addressController = TextEditingController();
+  final List<String> _addresses = [];
+
   @override
   void initState() {
     super.initState();
-
     _errorMessage = '';
 
     _languageTextControllers = OptionalLanguageType.values.map((language) {
@@ -64,6 +66,7 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
   void dispose() {
     _englishTextController.titleController.dispose();
     _englishTextController.bodyController.dispose();
+    _addressController.dispose();
 
     for (final controller in _languageTextControllers) {
       controller.titleController.dispose();
@@ -106,6 +109,24 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
                   ),
                   Gaps.h16,
                 ],
+                Gaps.h8,
+                TextField(
+                  controller: _addressController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter address',
+                    suffixIcon: IconButton(icon: const Icon(Icons.add), onPressed: _addAddress),
+                  ),
+                  onSubmitted: (_) => _addAddress(),
+                ),
+                Gaps.h16,
+                Wrap(
+                  children: _addresses.isNotEmpty
+                      ? _addresses.map((address) {
+                          return Chip(label: Text(address), onDeleted: () => setState(() => _addresses.remove(address)));
+                        }).toList()
+                      : [const Chip(label: Text('All addresses'))],
+                ),
+                Gaps.h16,
                 _AnnouncementField(
                   label: '${context.l10n.title} (${context.l10n.createAnnouncement_english})*',
                   controller: _englishTextController.titleController,
@@ -133,7 +154,7 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
                         ],
                       ),
                     ),
-                Gaps.h8,
+                Gaps.h16,
                 TextFormField(
                   readOnly: true,
                   decoration: InputDecoration(
@@ -185,7 +206,7 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
             SizedBox(
               height: 40,
               child: FilledButton(
-                onPressed: _saveSucceeded && _saving ? _createAnnouncement : null,
+                onPressed: !_saving ? _createAnnouncement : null,
                 child: Text(context.l10n.create),
               ),
             ),
@@ -194,12 +215,22 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
     );
   }
 
+  void _addAddress() {
+    final address = _addressController.text.trim();
+    if (address.isNotEmpty && !_addresses.contains(address)) {
+      setState(() {
+        _addresses.add(address);
+        _addressController.clear();
+      });
+    }
+  }
+
   Future<void> _createAnnouncement() async {
     if (_expiresAt == null ||
         _selectedImpact == null ||
-        _englishTextController.titleController.text != '' ||
-        _englishTextController.bodyController.text != '') {
-      _fillAllRequiredFields = true;
+        _englishTextController.titleController.text.isEmpty ||
+        _englishTextController.bodyController.text.isEmpty) {
+      setState(() => _fillAllRequiredFields = true);
       return;
     }
 
@@ -230,7 +261,10 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
         );
 
     if (response.hasError) {
-      _errorMessage = response.error.message;
+      setState(() {
+        _errorMessage = response.error.message;
+        _saving = false;
+      });
       return;
     }
 
