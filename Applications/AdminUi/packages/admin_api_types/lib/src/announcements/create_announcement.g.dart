@@ -10,12 +10,12 @@ CreateAnnouncement _$CreateAnnouncementFromJson(Map<String, dynamic> json) => Cr
       expiresAt: DateTime.parse(json['expiresAt'] as String),
       severity: json['severity'] as String,
       announcementTexts: (json['announcementTexts'] as List<dynamic>).map(AnnouncementText.fromJson).toList(),
-      addresses: (json['addresses'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      specificAddresses: (json['specificAddresses'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$CreateAnnouncementToJson(CreateAnnouncement instance) => <String, dynamic>{
       'expiresAt': instance.expiresAt.toIso8601String(),
       'severity': instance.severity,
       'announcementTexts': instance.announcementTexts,
-      'addresses': instance.addresses,
+      'specificAddresses': instance.specificAddresses,
     };

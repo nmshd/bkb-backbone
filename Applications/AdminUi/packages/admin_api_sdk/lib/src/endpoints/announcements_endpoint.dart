@@ -15,10 +15,11 @@ class AnnouncementsEndpoint extends Endpoint {
     required String expiresAt,
     required String severity,
     required List<AnnouncementText> announcementTexts,
+    required List<String> specificAddresses,
   }) =>
       post(
         '/api/v1/Announcements',
-        data: {'expiresAt': expiresAt, 'severity': severity, 'announcementTexts': announcementTexts},
+        data: {'expiresAt': expiresAt, 'severity': severity, 'announcementTexts': announcementTexts, 'specificAddresses': specificAddresses},
         transformer: CreateAnnouncement.fromJson,
       );
 }

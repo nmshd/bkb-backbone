@@ -23,7 +23,7 @@ class _AnnouncementsOverviewState extends State<AnnouncementsOverview> {
   void initState() {
     super.initState();
 
-    _reloadAnnouncements();
+    // _reloadAnnouncements();
   }
 
   @override

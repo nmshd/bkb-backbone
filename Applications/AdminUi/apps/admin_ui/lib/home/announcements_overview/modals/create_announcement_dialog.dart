@@ -113,7 +113,9 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
                 TextField(
                   controller: _addressController,
                   decoration: InputDecoration(
-                    labelText: 'Enter address',
+                    labelText: context.l10n.identities,
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     suffixIcon: IconButton(icon: const Icon(Icons.add), onPressed: _addAddress),
                   ),
                   onSubmitted: (_) => _addAddress(),
@@ -122,9 +124,26 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
                 Wrap(
                   children: _addresses.isNotEmpty
                       ? _addresses.map((address) {
-                          return Chip(label: Text(address), onDeleted: () => setState(() => _addresses.remove(address)));
+                          return Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Chip(
+                              label: Text(address),
+                              onDeleted: () => setState(
+                                () => _addresses.remove(address),
+                              ),
+                            ),
+                          );
                         }).toList()
-                      : [const Chip(label: Text('All addresses'))],
+                      : [
+                          Chip(
+                            label: Text(context.l10n.allIdentities),
+                            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: const BorderSide(color: Colors.transparent),
+                            ),
+                          ),
+                        ],
                 ),
                 Gaps.h16,
                 _AnnouncementField(
@@ -258,6 +277,7 @@ class _CreateAnnouncementDialogState extends State<_CreateAnnouncementDialog> {
           expiresAt: _expiresAt!.toIso8601String(),
           severity: _selectedImpact!,
           announcementTexts: announcementTexts,
+          specificAddresses: _addresses,
         );
 
     if (response.hasError) {
