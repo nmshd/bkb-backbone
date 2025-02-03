@@ -154,7 +154,7 @@ public record TestOutput
 }
 // ReSharper restore InconsistentNaming
 
-public class TestDataWithAllCases : TheoryData<TestInput, TestOutput?>
+public class TestDataWithAllCases : TheoryData<TestInput, TestOutput>
 {
     public TestDataWithAllCases()
     {

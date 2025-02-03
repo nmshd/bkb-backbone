@@ -5,17 +5,16 @@ using FakeItEasy;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
 
 namespace Backbone.BuildingBlocks.Infrastructure.Tests.Tests;
 
 public class GoogleCloudStorageTests : AbstractTestsBase, IAsyncLifetime
 {
-    public const string BUCKET_NAME = "test-bucket-nmshd";
+    private const string BUCKET_NAME = "test-bucket-nmshd";
     private readonly StorageClient _storageClient;
     private readonly GoogleCloudStorage _blobStorageUnderTest;
 
-    public GoogleCloudStorageTests(ITestOutputHelper output)
+    public GoogleCloudStorageTests()
     {
         const string authJson = "";
 
@@ -24,12 +23,12 @@ public class GoogleCloudStorageTests : AbstractTestsBase, IAsyncLifetime
         _blobStorageUnderTest = new GoogleCloudStorage(_storageClient, A.Fake<ILogger<GoogleCloudStorage>>());
     }
 
-    public Task InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         var blobs = _storageClient.ListObjectsAsync(BUCKET_NAME);
 
@@ -118,7 +117,7 @@ public class GoogleCloudStorageTests : AbstractTestsBase, IAsyncLifetime
 
         await _blobStorageUnderTest.SaveAsync();
 
-        var retrievedBlobContent = await (await _blobStorageUnderTest.FindAllAsync(BUCKET_NAME)).ToListAsync();
+        var retrievedBlobContent = await (await _blobStorageUnderTest.FindAllAsync(BUCKET_NAME)).ToListAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         retrievedBlobContent.Should().Contain("BlobName1");
         retrievedBlobContent.Should().Contain("BlobName2");

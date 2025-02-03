@@ -27,7 +27,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
     [Fact(Skip = "No valid emulator for GCP")]
     public async Task One_subscriber_for_one_event()
     {
-        await Task.Delay(30.Seconds());
+        await Task.Delay(30.Seconds(), TestContext.Current.CancellationToken);
 
         var subscriber = _factory.CreateEventBus();
         var publisher = _factory.CreateEventBus();
@@ -42,7 +42,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
     [Fact(Skip = "No valid emulator for GCP")]
     public async Task Subscribe_to_the_same_event_twice_with_the_same_subscriber()
     {
-        await Task.Delay(30.Seconds());
+        await Task.Delay(30.Seconds(), TestContext.Current.CancellationToken);
 
         var subscriber = _factory.CreateEventBus();
         var publisher = _factory.CreateEventBus();
@@ -59,7 +59,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
     [Fact(Skip = "No valid emulator for GCP")]
     public async Task Two_subscribers_for_the_same_event_both_receive_the_event()
     {
-        await Task.Delay(30.Seconds());
+        await Task.Delay(30.Seconds(), TestContext.Current.CancellationToken);
 
         var subscriber1 = _factory.CreateEventBus("subscription1");
         var subscriber2 = _factory.CreateEventBus("subscription2");
@@ -77,7 +77,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
     [Fact(Skip = "No valid emulator for GCP")]
     public async Task Only_one_instance_of_a_subscriber_receives_the_event()
     {
-        await Task.Delay(30.Seconds());
+        await Task.Delay(30.Seconds(), TestContext.Current.CancellationToken);
 
         var subscriber1A = _factory.CreateEventBus("subscription1");
         var subscriber1B = _factory.CreateEventBus("subscription1");
@@ -88,7 +88,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
 
         await publisher.Publish(new TestEvent1DomainEvent());
 
-        await Task.Delay(5.Seconds()); // wait some time to make sure all subscribers were notified
+        await Task.Delay(5.Seconds(), TestContext.Current.CancellationToken); // wait some time to make sure all subscribers were notified
 
         var numberOfTriggeredInstancesOfHandler1 =
             TestEvent1DomainEventHandler1.Instances.Count(i => i.Triggered);
@@ -104,7 +104,7 @@ public class GoogleCloudPubSubTests : AbstractTestsBase, IAsyncDisposable
     [Fact(Skip = "No valid emulator for GCP")]
     public async Task The_correct_event_handler_is_called_when_multiple_subscriptions_exist()
     {
-        await Task.Delay(30.Seconds());
+        await Task.Delay(30.Seconds(), TestContext.Current.CancellationToken);
 
         var subscriber1 = _factory.CreateEventBus();
         var publisher = _factory.CreateEventBus();
